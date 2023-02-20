@@ -1,0 +1,79 @@
+package highPeak;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Scanner;
+
+class JobSizes{
+    public Integer startTime;
+    public Integer endTime;
+    public Integer earnings;
+
+    public JobSizes(Integer startTime, Integer endTime, Integer earnings) {
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.earnings = earnings;
+    }
+}
+
+public class Assignments{
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        for (int input = 1; input <= 3; input++) {
+            System.out.println("Sample Input: " + input);
+
+            System.out.println("Enter the number of Jobs");
+            int n = sc.nextInt();
+            JobSizes[] arr = new JobSizes[n];
+            int earnings, total = 0;
+            String startTime, endTime;
+            System.out.println("Enter job start time, end time, and earnings");
+            for (int i = 0; i < n; i++) {
+                startTime = padTime(sc.next());
+                endTime = padTime(sc.next());
+                earnings = sc.nextInt();
+                arr[i] = new JobSizes(getTime(startTime), getTime(endTime), earnings);
+                total += earnings;
+            }
+
+            Arrays.sort(arr, Comparator.comparing(job -> job.endTime));
+            JobSizes lastJob = arr[0];
+            int dp = lastJob.earnings;
+            int numOfJobs = 1;
+            for (int i = 1; i < n; i++) {
+                if (arr[i].startTime >= lastJob.endTime) {
+                    dp += arr[i].earnings;
+                    lastJob = arr[i];
+                    numOfJobs++;
+                } else if (arr[i].earnings > lastJob.earnings) {
+                    dp = dp - lastJob.earnings + arr[i].earnings;
+                    lastJob = arr[i];
+                }
+            }
+
+            System.out.println("Output: " + input);
+            System.out.println("The number of tasks and earnings available for others");
+            System.out.println("Task: " + (n - numOfJobs));
+            System.out.println("Earnings: " + (total - dp));
+
+            System.out.println("***********************");
+            System.out.println();
+        }
+
+        sc.close();
+    }
+
+    private static String padTime(String time) {
+        while (time.length() < 4) {
+            time = "0" + time;
+        }
+        return time;
+    }
+
+    private static int getTime(String time) {
+        int hr = (time.charAt(0) - '0') * 10 + (time.charAt(1) - '0');
+        int min = (time.charAt(2) - '0') * 10 + (time.charAt(3) - '0');
+        return hr * 60 + min;
+    }
+}
